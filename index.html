@@ -17,7 +17,7 @@
     border: none;
   }
 
-  /* UI（クリック無効！） */
+  /* ===== UI（絶対に操作を邪魔しない） ===== */
   .keys {
     position: absolute;
     top: 20px;
@@ -25,30 +25,33 @@
     display: grid;
     grid-template-columns: 50px 50px 50px;
     grid-template-rows: 50px 50px 40px;
-    gap: 5px;
-    opacity: 0.4;
+    gap: 6px;
+    opacity: 0.35;
 
-    pointer-events: none; /* ← 超重要 */
+    pointer-events: none; /* ←超重要 */
+    user-select: none;
   }
 
   .key {
-    border: 2px solid white;
+    border: 2px solid rgba(255,255,255,0.8);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: sans-serif;
-    background: rgba(255,255,255,0.1);
+    font-weight: bold;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(4px);
     transition: 0.08s;
   }
 
   .active {
-    background: rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.9);
     color: black;
-    transform: scale(0.95);
+    transform: scale(0.92);
   }
 
-  /* WASD配置 */
+  /* WASD */
   .w { grid-column: 2; grid-row: 1; }
   .a { grid-column: 1; grid-row: 2; }
   .s { grid-column: 2; grid-row: 2; }
@@ -64,14 +67,14 @@
 
 <body>
 
-<!-- ゲーム -->
+<!-- ===== ゲーム ===== -->
 <iframe 
   src="https://narrow.one"
   id="game"
   tabindex="0"
 ></iframe>
 
-<!-- 入力UI -->
+<!-- ===== 入力表示 ===== -->
 <div class="keys">
   <div class="key w" id="w">W</div>
   <div class="key a" id="a">A</div>
@@ -81,6 +84,9 @@
 </div>
 
 <script>
+/* =========================
+   キーマッピング
+========================= */
 const map = {
   w: "w",
   a: "a",
@@ -89,29 +95,56 @@ const map = {
   " ": "space"
 };
 
+const pressed = {};
+
+/* =========================
+   キー検知（横取り・非干渉）
+========================= */
+document.addEventListener("keydown", (e) => {
+  const key = e.key.toLowerCase();
+
+  if (map[key] && !pressed[key]) {
+    pressed[key] = true;
+    document.getElementById(map[key])?.classList.add("active");
+  }
+
+}, true); // ← capture重要
+
+document.addEventListener("keyup", (e) => {
+  const key = e.key.toLowerCase();
+
+  if (map[key]) {
+    pressed[key] = false;
+    document.getElementById(map[key])?.classList.remove("active");
+  }
+
+}, true);
+
+
+/* =========================
+   フォーカス制御（ゲーム優先）
+========================= */
 const iframe = document.getElementById("game");
 
-/* クリックしたらゲームにフォーカス */
+/* どこクリックしてもゲームに戻す */
 window.addEventListener("click", () => {
-  iframe.focus();
+  iframe?.focus();
 });
 
-/* キー押下 */
-window.addEventListener("keydown", (e) => {
-  const key = e.key.toLowerCase();
-  if (map[key]) {
-    const el = document.getElementById(map[key]);
-    if (el) el.classList.add("active");
-  }
-});
 
-/* キー離す */
-window.addEventListener("keyup", (e) => {
-  const key = e.key.toLowerCase();
-  if (map[key]) {
-    const el = document.getElementById(map[key]);
-    if (el) el.classList.remove("active");
-  }
+/* =========================
+   バグ防止リセット
+========================= */
+function resetKeys() {
+  Object.keys(map).forEach(k => {
+    pressed[k] = false;
+    document.getElementById(map[k])?.classList.remove("active");
+  });
+}
+
+window.addEventListener("blur", resetKeys);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) resetKeys();
 });
 </script>
 
