@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Narrow One + WASD + Space</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: black;
+  }
+
+  iframe {
+    width: 100vw;
+    height: 100vh;
+    border: none;
+  }
+
+  .keys {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: grid;
+    grid-template-columns: 50px 50px 50px;
+    grid-template-rows: 50px 50px 40px;
+    gap: 5px;
+    opacity: 0.4;
+  }
+
+  .key {
+    border: 2px solid white;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: sans-serif;
+    background: rgba(255,255,255,0.1);
+    transition: 0.1s;
+  }
+
+  .active {
+    background: rgba(255,255,255,0.8);
+    color: black;
+  }
+
+  /* WASD */
+  .w { grid-column: 2; grid-row: 1; height: 50px; }
+  .a { grid-column: 1; grid-row: 2; height: 50px; }
+  .s { grid-column: 2; grid-row: 2; height: 50px; }
+  .d { grid-column: 3; grid-row: 2; height: 50px; }
+
+  /* Space（横長） */
+  .space {
+    grid-column: 1 / span 3;
+    grid-row: 3;
+    height: 40px;
+  }
+</style>
+</head>
+<body>
+
+<iframe src="https://narrow.one"></iframe>
+
+<div class="keys">
+  <div class="key w" id="w">W</div>
+  <div class="key a" id="a">A</div>
+  <div class="key s" id="s">S</div>
+  <div class="key d" id="d">D</div>
+  <div class="key space" id="space">SPACE</div>
+</div>
+
+<script>
+  const map = {
+    w: "w",
+    a: "a",
+    s: "s",
+    d: "d",
+    " ": "space" // スペースキー
+  };
+
+  window.addEventListener("keydown", (e) => {
+    const key = e.key.toLowerCase();
+    if (map[key]) {
+      document.getElementById(map[key]).classList.add("active");
+    }
+  });
+
+  window.addEventListener("keyup", (e) => {
+    const key = e.key.toLowerCase();
+    if (map[key]) {
+      document.getElementById(map[key]).classList.remove("active");
+    }
+  });
+</script>
+
+</body>
+</html>
