@@ -2,7 +2,8 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>Narrow One + WASD + Space</title>
+<title>Narrow One + Input Overlay</title>
+
 <style>
   body {
     margin: 0;
@@ -16,6 +17,7 @@
     border: none;
   }
 
+  /* UI（クリック無効！） */
   .keys {
     position: absolute;
     top: 20px;
@@ -25,6 +27,8 @@
     grid-template-rows: 50px 50px 40px;
     gap: 5px;
     opacity: 0.4;
+
+    pointer-events: none; /* ← 超重要 */
   }
 
   .key {
@@ -35,32 +39,39 @@
     justify-content: center;
     font-family: sans-serif;
     background: rgba(255,255,255,0.1);
-    transition: 0.1s;
+    transition: 0.08s;
   }
 
   .active {
-    background: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.85);
     color: black;
+    transform: scale(0.95);
   }
 
-  /* WASD */
-  .w { grid-column: 2; grid-row: 1; height: 50px; }
-  .a { grid-column: 1; grid-row: 2; height: 50px; }
-  .s { grid-column: 2; grid-row: 2; height: 50px; }
-  .d { grid-column: 3; grid-row: 2; height: 50px; }
+  /* WASD配置 */
+  .w { grid-column: 2; grid-row: 1; }
+  .a { grid-column: 1; grid-row: 2; }
+  .s { grid-column: 2; grid-row: 2; }
+  .d { grid-column: 3; grid-row: 2; }
 
-  /* Space（横長） */
+  /* Space */
   .space {
     grid-column: 1 / span 3;
     grid-row: 3;
-    height: 40px;
   }
 </style>
 </head>
+
 <body>
 
-<iframe src="https://narrow.one"></iframe>
+<!-- ゲーム -->
+<iframe 
+  src="https://narrow.one"
+  id="game"
+  tabindex="0"
+></iframe>
 
+<!-- 入力UI -->
 <div class="keys">
   <div class="key w" id="w">W</div>
   <div class="key a" id="a">A</div>
@@ -70,27 +81,38 @@
 </div>
 
 <script>
-  const map = {
-    w: "w",
-    a: "a",
-    s: "s",
-    d: "d",
-    " ": "space" // スペースキー
-  };
+const map = {
+  w: "w",
+  a: "a",
+  s: "s",
+  d: "d",
+  " ": "space"
+};
 
-  window.addEventListener("keydown", (e) => {
-    const key = e.key.toLowerCase();
-    if (map[key]) {
-      document.getElementById(map[key]).classList.add("active");
-    }
-  });
+const iframe = document.getElementById("game");
 
-  window.addEventListener("keyup", (e) => {
-    const key = e.key.toLowerCase();
-    if (map[key]) {
-      document.getElementById(map[key]).classList.remove("active");
-    }
-  });
+/* クリックしたらゲームにフォーカス */
+window.addEventListener("click", () => {
+  iframe.focus();
+});
+
+/* キー押下 */
+window.addEventListener("keydown", (e) => {
+  const key = e.key.toLowerCase();
+  if (map[key]) {
+    const el = document.getElementById(map[key]);
+    if (el) el.classList.add("active");
+  }
+});
+
+/* キー離す */
+window.addEventListener("keyup", (e) => {
+  const key = e.key.toLowerCase();
+  if (map[key]) {
+    const el = document.getElementById(map[key]);
+    if (el) el.classList.remove("active");
+  }
+});
 </script>
 
 </body>
